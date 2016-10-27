@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\lazarusfreepacal\fpc\3.1.1\bin\x86_64-win64\fpc.exe" Date="1227454317"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -g -gl -l -vewnhibq -FuC:\lazarusfreepacal\packager\units\x86_64-win64 -FuC:\lazarusfreepacal\components\lazutils\lib\x86_64-win64 -FuC:\lazarusfreepacal\components\codetools\units\x86_64-win64 -FuC:\lazarusfreepacal\lcl\units\x86_64-win64 -FuC:\lazarusfreepacal\lcl\units\x86_64-win64\win32 -FuC:\lazarusfreepacal\components\cairocanvas\lib\x86_64-win64\win32 -FuC:\lazarusfreepacal\components\lazcontrols\lib\x86_64-win64\win32 -FuC:\lazarusfreepacal\components\synedit\units\x86_64-win64\win32 -FuC:\lazarusfreepacal\components\ideintf\units\x86_64-win64\win32 -FuC:\lazarusfreepacal\components\printers\lib\x86_64-win64\win32 -FuC:\lazarusfreepacal\components\lazreport\source\lib\x86_64-win64 -FuC:\lazarusfreepacal\components\sqldb\lib\x86_64-win64\win32 -FuC:\lazarusfreepacal\components\lazreport\source\addons\SqlDB\ -FUC:\lazarusfreepacal\components\lazreport\source\addons\SqlDB\lib\x86_64-win64\ -dLCL -dLCLwin32 lr_sqldb.pas"/>
+</CONFIG>

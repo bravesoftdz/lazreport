@@ -1,0 +1,171 @@
+
+{*****************************************}
+{                                         }
+{             FastReport v2.3             }
+{               Fields list               }
+{                                         }
+{  Copyright (c) 1998-99 by Tzyganenko A. }
+{                                         }
+{*****************************************}
+
+unit LR_Flds;
+
+interface
+
+{$I LR_Vers.inc}
+
+uses
+  Classes, SysUtils, LResources,
+  Forms, Controls, Graphics, Dialogs,
+  StdCtrls,LCLType, ExtCtrls, ComCtrls, TreeFilterEdit;
+
+type
+
+  { TfrFieldsForm }
+
+  TfrFieldsForm = class(TForm)
+    ImgDataset: TImageList;
+    Label1: TLabel;
+    Panel1: TPanel;
+    TreeFilterEdit5: TTreeFilterEdit;
+    TreeDB: TTreeView;
+    procedure FormShow(Sender: TObject);
+    procedure TreeDBDblClick(Sender: TObject);
+    procedure TreeDBKeyDown(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
+    procedure FormCreate(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      {%H-}Shift: TShiftState);
+  private
+    { Private declarations }
+    procedure UpdateDBField;
+    procedure RefreshDSList;
+  public
+    { Public declarations }
+    DBField: String;
+  end;
+
+var
+  frFieldsForm: TfrFieldsForm;
+implementation
+
+{$R *.lfm}
+
+uses LR_Class, LR_Const, LR_Utils, LR_DBRel, DB;
+
+var
+  LastDB: String;
+
+
+
+procedure TfrFieldsForm.UpdateDBField;
+begin
+  DBField := '';
+  with TreeDB do
+  begin
+    if Selected.Level = 2 then
+      DBField := Selected.Parent.Text + '."' + Selected.Text + '"';
+  end;
+end;
+
+procedure TfrFieldsForm.RefreshDSList;
+var
+  Lst : TStringList;
+  i   : Integer = 0;
+  x   : Integer = 0;
+  z   : Integer = 4;
+  c   : String;
+  DataSet : TDataSet;
+begin
+  Lst := TStringList.Create;
+  try
+    if CurReport.DataType = dtDataSet then
+      frGetComponents(CurReport.Owner, TDataSet, Lst, nil)
+    else
+      frGetComponents(CurReport.Owner, TDataSource, Lst, nil);
+
+    with TreeDB.Items do
+    begin
+      Clear;
+      AddFirst(nil,sVBandEditorFormDataSource);  //Nodo principal
+      Item[0].ImageIndex:= 0;    // Imagen del nodo
+      if Lst.Count > 0 then begin
+         for i := 0 to Pred(Lst.Count) do // Nodos hijos
+           AddChildFirst(Item[0],Lst.Strings[i]);
+         {Se agregan los campos o filas a cada dataset}
+         for i := 0 to Pred(Item[0].Count) do begin
+           with Item[0] do begin
+              Items[i].ImageIndex:= 1;
+              DataSet := frGetDataSet(Items[i].Text);
+              if Assigned(DataSet) then begin
+                try
+                  if DataSet.FieldCount = 0 then
+                      DataSet.Opening;
+
+                  for x := 0 to Pred(DataSet.FieldCount) do begin
+                    AddChild(Items[i],DataSet.FieldDefs[x].Name);
+                    case Dataset.FieldDefs[x].DataType of
+                      ftBoolean : z := 8;
+                      ftAutoInc : z := 2;
+                      ftFloat   : z := 13;
+                      ftCurrency: z := 11;
+                      ftDate    : z := 7;
+                      ftTime,ftDateTime,ftTimeStamp   : z := 6;
+                      ftMemo,ftBytes,ftFmtMemo,ftOraBlob,ftBlob : z := 9;
+                      ftGraphic                                 : z := 10;
+                      ftInteger                                 : z := 5;
+                    else
+                      z := 4;
+                    end;
+                    Items[i].Items[x].ImageIndex:= z;
+                  end;
+
+                  if DataSet.Active then
+                     DataSet.ForceClose;
+                except
+                end;
+              end;
+            end;
+         end;
+      end;
+    end;
+    TreeDB.Enabled:= (Lst.Count>0);
+  finally
+    Lst.Free;
+  end;
+end;
+
+procedure TfrFieldsForm.FormShow(Sender: TObject);
+begin
+  RefreshDSList;
+end;
+
+procedure TfrFieldsForm.TreeDBDblClick(Sender: TObject);
+begin
+  UpdateDbField;
+  if DBField <> '' then
+    ModalResult := mrOk;
+end;
+
+procedure TfrFieldsForm.TreeDBKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = vk_Return then
+  begin
+    TreeDBDblClick(Sender);
+  end;
+end;
+
+procedure TfrFieldsForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = vk_Escape then
+    ModalResult := mrCancel;
+end;
+
+procedure TfrFieldsForm.FormCreate(Sender: TObject);
+begin
+  Caption         := sFieldsFormInsert;
+  Label1.Caption  := sFieldsFormAviableDB;
+end;
+
+end.
